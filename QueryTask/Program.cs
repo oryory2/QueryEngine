@@ -15,6 +15,15 @@ namespace QueryTask
             Order o1 = new Order("A", 123);
             Order o2 = new Order("B", 123);
 
+
+            for(int i = 0; i < 1000; i++)
+            {
+                d.addUser(u1);
+                d.addUser(u2);
+                d.addUser(u3);
+                d.addOrder(o1);
+                d.addOrder(o2);
+            }
             d.addUser(u1);
             d.addUser(u2);
             d.addUser(u3);
