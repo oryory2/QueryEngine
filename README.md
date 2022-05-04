@@ -6,7 +6,7 @@
 
 In this project i implemented a QueryEngine - that can handle a given Query from the User (represent by a String).
 
-Assamptions:
+Assumptions:
   - The only Object in the DataBase are Users And Orders.
       - User fields: FullName, Email, Age.
       - Order fields: FullName, Id.
