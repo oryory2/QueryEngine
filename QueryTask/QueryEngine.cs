@@ -119,7 +119,7 @@ namespace QueryTask
 
             foreach (Object curr in objects) // Iterate on each User/Order in the DataBase
             {
-                bool flag = false;
+                bool flag = true;
                 String oper = "";
                 int countLists = 0;
 
@@ -140,6 +140,11 @@ namespace QueryTask
                         else if (type == 1) // Object = User
                             boolInt = ((User)curr).booleanExpressionCheck(list[i], list[i + 1], list[i + 2]); // Check a single boolean expression (field, oper, val)
 
+                        if(oper != "" && (oper.ToLower() != "and" && oper.ToLower() != "or"))
+                        {
+                            Console.WriteLine("Wrong 'where' input - '" + oper + "' is not a valid Operator");
+                            return defualtL;
+                        }
 
                         if (boolInt == 0) // false
                             flag = this.updateBoolFlag(flag, i, oper, false, countLists);
@@ -161,7 +166,7 @@ namespace QueryTask
                 }
                 if (flag) // Check if curr is Qualify the Query criteria
                     candidates.Add(curr);
-                flag = false;
+                flag = true;
             }
             return candidates;
         }
@@ -170,29 +175,14 @@ namespace QueryTask
 
         public bool updateBoolFlag(bool flag, int i, String oper, bool isTrue, int countLists) // Function for updating the boolean value that determine the qualify of an Object on the Query criteria
         {
-            if (isTrue)
-            {
-                if (i == 0 && countLists == 1)
-                    flag = true;
-                else
-                {
-                    if (oper.Equals("AND"))
-                        flag = flag && true;
-                    else
-                        flag = flag || true;
-                }
-            }
+            if (i == 0 && countLists == 1)
+                flag = isTrue;
             else
             {
-                if (i == 0 && countLists == 1)
-                    flag = false;
-                else
-                {
-                    if (oper.Equals("AND"))
-                        flag = flag && false;
-                    else
-                        flag = flag || false;
-                }
+                if (oper.ToLower().Equals("and"))
+                    flag = flag && isTrue;
+                else if (oper.ToLower().Equals("or"))
+                    flag = flag || isTrue;
             }
             return flag;
         }
