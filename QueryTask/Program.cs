@@ -15,15 +15,6 @@ namespace QueryTask
             Order o1 = new Order("A", 123);
             Order o2 = new Order("B", 123);
 
-
-            for(int i = 0; i < 1000; i++)
-            {
-                d.addUser(u1);
-                d.addUser(u2);
-                d.addUser(u3);
-                d.addOrder(o1);
-                d.addOrder(o2);
-            }
             d.addUser(u1);
             d.addUser(u2);
             d.addUser(u3);
@@ -34,7 +25,7 @@ namespace QueryTask
             QueryEngine q = new QueryEngine(d);
 
             List<List<String>> queryAns1 = q.handleQuery("from Users where Age = 40 Or (Age < 30 AND Email = 'oryory2@gmail.com' AND Age = 29) AND FullName = 'John Doe' select Email, Age, FullName");
-            List<List<String>> queryAns2 = q.handleQuery("from Orders where (FullName    =    \n    'A' OR FullName = 'C') AND (Id = 123 Or Id = 124) select FullName");
+            List<List<String>> queryAns2 = q.handleQuery("from Orders\nwhere (FullName    = 'A' OR FullName =        'C')       AND (Id = 123 Or Id = 124) select FullName");
         }
     }
 }

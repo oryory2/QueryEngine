@@ -29,7 +29,7 @@ namespace QueryTask
             }
 
             // Clean downLines
-            query = query.Replace("\n", "");
+            query = query.Replace("\n", " ");
 
             // Clean extra spaces
             while (query.Contains("  "))
