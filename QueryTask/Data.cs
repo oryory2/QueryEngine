@@ -29,14 +29,14 @@ namespace QueryTask
             Console.WriteLine("Order: '" + o.getName() + "' has been added to the DataBase");
         }
 
-        public List<User> getUsers()
+        public List<Object> getUsers()
         {
-            return this.Users;
+            return this.Users.Cast<object>().ToList(); ;
         }
 
-        public List<Order> getOrders()
+        public List<Object> getOrders()
         {
-            return this.Orders;
+            return this.Orders.Cast<object>().ToList(); ;
         }
     }
 }

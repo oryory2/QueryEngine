@@ -26,6 +26,7 @@ namespace QueryTask
             if (query == null)
             {
                 Console.WriteLine("Wrong input");
+                return defualtL;
             }
 
             // Clean downLines
@@ -58,12 +59,12 @@ namespace QueryTask
             switch (from) // Getting a List of the Candidates Objects (Orders/Users) that meet the Query criteria, and getting their wanted fields
             {
                 case "Orders":
-                    List<Order> orders = getCandidatesOrders(whereWords, this.data.getOrders());
-                    return getWantedFieldsOrders(orders, select);
+                    List<Object> orders = getCandidates(whereWords, this.data.getOrders(), 0);
+                    return getWantedFields(orders, select, 0);
 
                 case "Users":
-                    List<User> Users = getCandidatesUsers(whereWords, this.data.getUsers());
-                    return getWantedFieldsUsers(Users, select);
+                    List<Object> Users = getCandidates(whereWords, this.data.getUsers(), 1);
+                    return getWantedFields(Users, select, 1);
 
                 default:
                     Console.WriteLine("Wrong 'from' input - there is no '" + from + "' Objects in the DataBase");
@@ -72,127 +73,52 @@ namespace QueryTask
         }
 
 
-        public List<List<String>> getWantedFieldsUsers(List<User> users, String select) // Function for creating the Query Answer
+        public List<List<String>> getWantedFields(List<Object> candidates, String select, int type) // Function for creating the Query Answer (type: 0 = Order, 1 = User)
         {
             List<List<String>> defualtL = new List<List<string>>();
             List<List<String>> l = new List<List<string>>();
 
-            if (users.Count == 0) // Check if there is no Candidate Users
+            if (candidates.Count == 0) // Check if there is no Candidate Objects
                 return defualtL;
             else
             {
                 string[] words = select.Split(',');
-                foreach(User u in users) // Iterate on each User, and getting all the needed fields
+                foreach (Object curr in candidates) // Iterate on each Object, and getting all the needed fields
                 {
-                    List<String> currUserList = new List<string>();
-                    foreach(String s in words)
-                    {
-                        String fixedS = s;
-                        if (s[0] == ' ')
-                            fixedS = s.Substring(1);
-
-                        currUserList = u.getFields(fixedS, currUserList); // Gets the User needed field
-
-                        if(currUserList.Count == 0) // Check if there is a problem with the "select" section
-                        {
-                            Console.WriteLine("Wrong 'select' input - User not include the field '" + fixedS + "'");
-                            return defualtL;
-                        }
-                    }
-                    l.Add(currUserList);
-                }
-                return l;
-            }
-        }
-        public List<User> getCandidatesUsers(List<List<String>> where, List<User> users)
-        {
-            List<User> defualtL = new List<User>();
-            List<User> candidates = new List<User>();
-
-            foreach(User u in users) // Iterate on each User in the DataBase
-            {
-                bool flag = false;
-                String oper = "";
-                int countLists = 0;
-                
-                foreach (List<String> list in where) // Iterate on each List - expression/s in the query
-                {
-                    countLists += 1;
-                    if (countLists % 2 == 0) // Check if the list contain only operator
-                    {
-                        oper = list[0];
-                        continue;
-                    }
-
-                    for (int i = 0; i < list.Count; i += 4) // i + 4 for each iteration (expression (3) + operator (1) = 4)
-                    {
-                        int boolInt = u.booleanExpressionCheck(list[i], list[i + 1], list[i + 2]); // Check a single boolean expression (field, oper, val)
-
-                        if(boolInt == 0) // false
-                            flag = this.updateBoolFlag(flag, i, oper, false, countLists);
-
-                        else if (boolInt == 1) // true
-                            flag = this.updateBoolFlag(flag, i, oper, true, countLists);
-
-                        else if (boolInt == 2) // Wrong input in the "where" section
-                        {
-                            Console.WriteLine("Wrong 'where' input - User not include the field '" + list[i] + "'");
-                            return defualtL;
-                        }
-
-                        if(list.Count > i + 4) // Check if the current list is including more expressions (List of parenthesis expression)
-                            oper = list[i + 3];
-                        continue;
-                    }
-                }
-                if (flag) // Check if the User is Qualify the Query criteria
-                    candidates.Add(u);
-                flag = false;
-            }
-            return candidates;
-        }
-
-        public List<List<String>> getWantedFieldsOrders(List<Order> orders, String select) // Function for creating the Query Answer
-        {
-            List<List<String>> defualtL = new List<List<string>>();
-            List<List<String>> l = new List<List<string>>();
-
-            if (orders.Count == 0) // Check if there is no Candidate Orders
-                return l;
-            else
-            {
-                string[] words = select.Split(',');
-                foreach (Order o in orders) // Iterate on each Order, and getting all the needed fields
-                {
-                    List<String> currOrderList = new List<string>();
+                    List<String> currObjList = new List<string>();
                     foreach (String s in words)
                     {
                         String fixedS = s;
                         if (s[0] == ' ')
                             fixedS = s.Substring(1);
 
-                        currOrderList = o.getFields(fixedS, currOrderList); // Gets the Order needed field
+                        if (type == 0) // Object = Order
+                            currObjList = ((Order)curr).getFields(fixedS, currObjList); // Gets the Order needed field
 
-                        if (currOrderList.Count == 0) // Check if there is a problem with the "select" section
+                        else if (type == 1) // Object = User
+                            currObjList = ((User)curr).getFields(fixedS, currObjList); // Gets the User needed field
+
+                        if (currObjList.Count == 0) // Check if there is a problem with the "select" section
                         {
-                            Console.WriteLine("Wrong 'select' input - Order not include the field '" + fixedS + "'");
+                            if (type == 0)
+                                Console.WriteLine("Wrong 'select' input - Order not include the field '" + fixedS + "'");
+                            else if (type == 1)
+                                Console.WriteLine("Wrong 'select' input - User not include the field '" + fixedS + "'");
                             return defualtL;
                         }
                     }
-                    l.Add(currOrderList);
+                    l.Add(currObjList);
                 }
                 return l;
             }
         }
-
-
-        public List<Order> getCandidatesOrders(List<List<String>> where, List<Order> orders)
+        public List<Object> getCandidates(List<List<String>> where, List<Object> objects, int type) // Function for getting the Candidate Objects for the Query (type: 0 = Order, 1 = User)
         {
-            List<Order> candidates = new List<Order>();
+            List<Object> defualtL = new List<Object>();
+            List<Object> candidates = new List<Object>();
 
-            foreach (Order o in orders) // Iterate on each Order in the DataBase
+            foreach (Object curr in objects) // Iterate on each User/Order in the DataBase
             {
-                List<Order> defualtL = new List<Order>();
                 bool flag = false;
                 String oper = "";
                 int countLists = 0;
@@ -208,32 +134,38 @@ namespace QueryTask
 
                     for (int i = 0; i < list.Count; i += 4) // i + 4 for each iteration (expression (3) + operator (1) = 4)
                     {
-                        int boolInt = o.booleanExpressionCheck(list[i], list[i + 1], list[i + 2]); // Check a single boolean expression (field, oper, val)
+                        int boolInt = -1;
+                        if (type == 0) // Object = Order
+                            boolInt = ((Order)curr).booleanExpressionCheck(list[i], list[i + 1], list[i + 2]); // Check a single boolean expression (field, oper, val)
+                        else if (type == 1) // Object = User
+                            boolInt = ((User)curr).booleanExpressionCheck(list[i], list[i + 1], list[i + 2]); // Check a single boolean expression (field, oper, val)
+
 
                         if (boolInt == 0) // false
                             flag = this.updateBoolFlag(flag, i, oper, false, countLists);
-
                         else if (boolInt == 1) // true
                             flag = this.updateBoolFlag(flag, i, oper, true, countLists);
-
                         else if (boolInt == 2) // Wrong input in the "where" section
                         {
-                            Console.WriteLine("Wrong 'where' input - User not include the field '" + list[i] + "'");
+                            if(type == 0)
+                                Console.WriteLine("Wrong 'where' input - Order not include the field '" + list[i] + "'");
+                            else if(type == 1)
+                                Console.WriteLine("Wrong 'where' input - User not include the field '" + list[i] + "'");
                             return defualtL;
                         }
-                        if (list.Count > i + 4) // Check if the current list is including more expressions (List of parenthesis expression)
+
+                        if (list.Count > i + 4) // Check if the current list is including more expressions (parenthesis expression)
                             oper = list[i + 3];
                         continue;
                     }
                 }
-                if (flag) // Check if the Order is Qualify the Query criteria
-                    candidates.Add(o);
+                if (flag) // Check if curr is Qualify the Query criteria
+                    candidates.Add(curr);
                 flag = false;
             }
             return candidates;
         }
 
-        
 
 
         public bool updateBoolFlag(bool flag, int i, String oper, bool isTrue, int countLists) // Function for updating the boolean value that determine the qualify of an Object on the Query criteria
@@ -280,7 +212,7 @@ namespace QueryTask
             {
                 if (i + fixedIndex >= where.Length)
                 {
-                    if(!currWord.Equals(""))
+                    if (!currWord.Equals(""))
                     {
                         words.Add(currWord.Split(' ').ToList());
                         currWord = "";
@@ -422,11 +354,11 @@ namespace QueryTask
 
         public List<List<String>> fixStr(List<List<String>> words) // Function for fixing the String inputs that came with ' '/" " in the Query
         {
-            foreach(List<String> list in words)
+            foreach (List<String> list in words)
             {
-                for(int i = 0; i < list.Count; i++)
+                for (int i = 0; i < list.Count; i++)
                 {
-                    if(list[i][0] == '.')
+                    if (list[i][0] == '.')
                     {
                         list[i] = list[i].Substring(1).Replace('-', ' ');
                     }
