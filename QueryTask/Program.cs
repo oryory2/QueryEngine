@@ -7,7 +7,6 @@ namespace QueryTask
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("push");
             Data d = new Data();
             User u1 = new User("x", "oryory2@gmailg.com", 31);
             User u2 = new User("John Doe", "oryory2@gmail.com", 30);
@@ -25,7 +24,7 @@ namespace QueryTask
 
             QueryEngine q = new QueryEngine(d);
 
-            List<List<String>> queryAns1 = q.HandleQuery("from Users where Age = 40      or (Age <= 30 AND Email = 'oryory2@gmail.com' AND Age >= 29) AND FullName = 'John Doe' select Email, Age, FullName");
+            List<List<String>> queryAns1 = q.HandleQuery("from Users where Age = 40      oR (Age <= 30 AND Email = 'oryory2@gmail.com' AND Age >= 29) AND FullName = 'John Doe' select Email, Age, FullName");
             List<List<String>> queryAns2 = q.HandleQuery("from Orders\nwhere (FullName\n    = 'A' oR FullName =\n        'C')       and (Id = 123 Or Id = 124) select FullName, Id");
 
         }
