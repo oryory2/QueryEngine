@@ -12,105 +12,115 @@ namespace QueryTask
         public string fullName;
         public int age;
 
-        public User(String fullName, String email, int age)
+
+        public User(string fullName, string email, int age)
         {
             this.fullName = fullName;
             this.email = email;
             this.age = age;
         }
 
-        public String getName()
+        public string GetName()
         {
-            return this.fullName;
+            return fullName;
         }
 
-        public String getMail()
+        public string GetMail()
         {
-            return this.email;
+            return email;
         }
 
-        public int getAge()
+        public int GetAge()
         {
-            return this.age;
+            return age;
         }
 
-
-        public int booleanExpressionCheck(String field, String oper, String val) // Function for cheking a boolean expression (0 - false, 1 - true, 2 - wrong input)
+        public int BooleanExpressionCheck(string field, string oper, string val) // Function for cheking a boolean expression (0 - false, 1 - true, 2 - wrong input)
         {
             switch (field)
             {
                 case ("FullName"):
-                    if (this.getName().Equals(val))
-                        return 1;
-                    else
-                        return 0;
-
+                    return CheckName(val);
                 case ("Email"):
-                    if (this.getMail().Equals(val))
-                        return 1;
-                    else
-                        return 0;
-
+                    return CheckMail(val);
                 case ("Age"):
-                    if (oper == "=")
-                    {
-                        if (this.getAge() == Int32.Parse(val))
-                            return 1;
-                        else
-                            return 0;
-                    }
-                    else if (oper == ">")
-                    {
-                        if (this.getAge() > Int32.Parse(val))
-                            return 1;
-                        else
-                            return 0;
-                    }
-                    else if (oper == "<")
-                    {
-                        if (this.getAge() < Int32.Parse(val))
-                            return 1;
-                        else
-                            return 0;
-                    }
-                    else if (oper == "<=")
-                    {
-                        if (this.getAge() <= Int32.Parse(val))
-                            return 1;
-                        else
-                            return 0;
-                    }
-                    else if (oper == ">=")
-                    {
-                        if (this.getAge() >= Int32.Parse(val))
-                            return 1;
-                        else
-                            return 0;
-                    }
-                    break;
+                    return CheckAge(val, oper);
                 default:
                     return 2; // wrong input field
             }
-            return 2;
         }
 
-
-
-
-        public List<String> getFields(String field, List<String> currUserList) // Function for getting the needed fields by the "select" section
+        private int CheckName(string val) // 0 - false, 1 - true
         {
-            List<String> defualtL = new List<String>();
+            if (GetName().Equals(val))
+                return 1;
+            else
+                return 0;
+        }
+
+        private int CheckMail(string val) // 0 - false, 1 - true
+        {
+            if (GetMail().Equals(val))
+                return 1;
+            else
+                return 0;
+        }
+
+        private int CheckAge(string val, string oper) // 0 - false, 1 - true, 2 - wrong input
+        {
+            if (oper == "=")
+            {
+                if (GetAge() == Int32.Parse(val))
+                    return 1;
+                else
+                    return 0;
+            }
+            else if (oper == ">")
+            {
+                if (GetAge() > Int32.Parse(val))
+                    return 1;
+                else
+                    return 0;
+            }
+            else if (oper == "<")
+            {
+                if (GetAge() < Int32.Parse(val))
+                    return 1;
+                else
+                    return 0;
+            }
+            else if (oper == "<=")
+            {
+                if (GetAge() <= Int32.Parse(val))
+                    return 1;
+                else
+                    return 0;
+            }
+            else if (oper == ">=")
+            {
+                if (GetAge() >= Int32.Parse(val))
+                    return 1;
+                else
+                    return 0;
+            }
+            else
+                return 2;
+        }
+
+        public List<string> GetFields(string field, List<string> currUserList) // Function for getting the needed fields by the "select" section
+        {
+            List<string> defualtL = new List<string>();
 
             switch (field)
             {
                 case ("FullName"):
-                    currUserList.Add(this.getName());
+                    currUserList.Add(GetName());
                     break;
                 case ("Email"):
-                    currUserList.Add(this.getMail());
+                    currUserList.Add(GetMail());
                     break;
                 case ("Age"):
-                    currUserList.Add(this.getAge().ToString());
+                    currUserList.Add(GetAge().ToString());
                     break;
                 default:
                     return defualtL;

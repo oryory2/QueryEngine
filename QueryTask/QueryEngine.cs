@@ -8,75 +8,81 @@ namespace QueryTask
 {
     class QueryEngine
     {
+        private const int fromLen = 5;
+        private const int whereLen = 5;
+        private const int selectLen = 7;
+        private const int spaceLen = 1;
 
         private Data data; // DataBase 
 
         public QueryEngine(Data d)
         {
-            this.data = d;
+            data = d;
         }
 
-
-        public List<List<String>> handleQuery(String query) // Function for handling a new Query
+        public List<List<string>> HandleQuery(string query) // Function for handling a new Query
         {
 
-            List<List<String>> defualtL = new List<List<string>>();
+            List<List<string>> defualtL = new List<List<string>>();
 
-            // Input check
-            if (query == null)
+            if (query == null) // Input check
             {
                 Console.WriteLine("Wrong input");
                 return defualtL;
             }
 
-            // Clean downLines
-            query = query.Replace("\n", " ");
+            query = CleanDownLines(query);
 
-            // Clean extra spaces
-            while (query.Contains("  "))
-            {
-                query = query.Replace("  ", " ");
-            }
-
-            // Parse the Query
-            String from = "";
-            String where = "";
-            String select = "";
-
+            query = CleanSpaces(query);
 
             int whereIdx = query.IndexOf("where"); // Index of "where" in the Query
             int selectIdx = query.IndexOf("select"); // Index of "select" in the Query
 
             // Slicing the from/where/select parts
-            from = query.Substring(5, whereIdx - (5 + 1));
-            where = query.Substring(whereIdx + (5 + 1), selectIdx - (whereIdx + (5 + 1) + 1));
-            select = query.Substring(selectIdx + 7, query.Length - (selectIdx + 7));
+            string from = query.Substring(fromLen, whereIdx - (fromLen + spaceLen));
+            string where = query.Substring(whereIdx + (whereLen + spaceLen), selectIdx - (whereIdx + (whereLen + spaceLen) + spaceLen));
+            string select = query.Substring(selectIdx + selectLen, query.Length - (selectIdx + selectLen));
 
+            List<List<string>> whereWords = ParseWhere(where); // Creating a List of list<string>, each one represent a boolean expression
 
-            List<List<String>> whereWords = this.ParseWhere(where); // Creating a List of list<String>, each one represent a boolean expression
+            return AnswerQuery(defualtL, from, select, whereWords); // Get candidates Objects and return their wanted fields
+        }
 
-
+        private List<List<string>> AnswerQuery(List<List<string>> defualtL, string from, string select, List<List<string>> whereWords)
+        {
             switch (from) // Getting a List of the Candidates Objects (Orders/Users) that meet the Query criteria, and getting their wanted fields
             {
                 case "Orders":
-                    List<Object> orders = getCandidates(whereWords, this.data.getOrders(), 0);
-                    return getWantedFields(orders, select, 0);
-
+                    List<Object> orders = GetCandidates(whereWords, data.GetOrders(), 0);
+                    return GetWantedFields(orders, select, 0);
                 case "Users":
-                    List<Object> Users = getCandidates(whereWords, this.data.getUsers(), 1);
-                    return getWantedFields(Users, select, 1);
-
+                    List<Object> Users = GetCandidates(whereWords, data.GetUsers(), 1);
+                    return GetWantedFields(Users, select, 1);
                 default:
                     Console.WriteLine("Wrong 'from' input - there is no '" + from + "' Objects in the DataBase");
                     return defualtL;
             }
         }
 
-
-        public List<List<String>> getWantedFields(List<Object> candidates, String select, int type) // Function for creating the Query Answer (type: 0 = Order, 1 = User)
+        private static string CleanDownLines(string query) // Function for removing DownLines
         {
-            List<List<String>> defualtL = new List<List<string>>();
-            List<List<String>> l = new List<List<string>>();
+            query = query.Replace("\n", " ");
+            return query;
+        }
+
+        private static string CleanSpaces(string query) // Function for removing extra spaces
+        {
+            while (query.Contains("  "))
+            {
+                query = query.Replace("  ", " ");
+            }
+            return query;
+        }
+
+        public List<List<string>> GetWantedFields(List<Object> candidates, string select, int type) // Function for creating the Query Answer (type: 0 = Order, 1 = User)
+        {
+            List<List<string>> defualtL = new List<List<string>>();
+            List<List<string>> l = new List<List<string>>();
 
             if (candidates.Count == 0) // Check if there is no Candidate Objects
                 return defualtL;
@@ -85,18 +91,18 @@ namespace QueryTask
                 string[] words = select.Split(',');
                 foreach (Object curr in candidates) // Iterate on each Object, and getting all the needed fields
                 {
-                    List<String> currObjList = new List<string>();
-                    foreach (String s in words)
+                    List<string> currObjList = new List<string>();
+                    foreach (string s in words)
                     {
-                        String fixedS = s;
+                        string fixedS = s;
                         if (s[0] == ' ')
-                            fixedS = s.Substring(1);
+                            fixedS = s[1..];
 
                         if (type == 0) // Object = Order
-                            currObjList = ((Order)curr).getFields(fixedS, currObjList); // Gets the Order needed field
+                            currObjList = ((Order)curr).GetFields(fixedS, currObjList); // Gets the Order needed field
 
                         else if (type == 1) // Object = User
-                            currObjList = ((User)curr).getFields(fixedS, currObjList); // Gets the User needed field
+                            currObjList = ((User)curr).GetFields(fixedS, currObjList); // Gets the User needed field
 
                         if (currObjList.Count == 0) // Check if there is a problem with the "select" section
                         {
@@ -112,7 +118,7 @@ namespace QueryTask
                 return l;
             }
         }
-        public List<Object> getCandidates(List<List<String>> where, List<Object> objects, int type) // Function for getting the Candidate Objects for the Query (type: 0 = Order, 1 = User)
+        public List<Object> GetCandidates(List<List<string>> where, List<Object> objects, int type) // Function for getting the Candidate Objects for the Query (type: 0 = Order, 1 = User)
         {
             List<Object> defualtL = new List<Object>();
             List<Object> candidates = new List<Object>();
@@ -120,10 +126,10 @@ namespace QueryTask
             foreach (Object curr in objects) // Iterate on each User/Order in the DataBase
             {
                 bool flag = true;
-                String oper = "";
+                string oper = "";
                 int countLists = 0;
 
-                foreach (List<String> list in where) // Iterate on each List - expression/s in the query
+                foreach (List<string> list in where) // Iterate on each List - expression/s in the query
                 {
                     countLists += 1;
                     if (countLists % 2 == 0) // Check if the list contain only operator
@@ -136,9 +142,9 @@ namespace QueryTask
                     {
                         int boolInt = -1;
                         if (type == 0) // Object = Order
-                            boolInt = ((Order)curr).booleanExpressionCheck(list[i], list[i + 1], list[i + 2]); // Check a single boolean expression (field, oper, val)
+                            boolInt = ((Order)curr).BooleanExpressionCheck(list[i], list[i + 1], list[i + 2]); // Check a single boolean expression (field, oper, val)
                         else if (type == 1) // Object = User
-                            boolInt = ((User)curr).booleanExpressionCheck(list[i], list[i + 1], list[i + 2]); // Check a single boolean expression (field, oper, val)
+                            boolInt = ((User)curr).BooleanExpressionCheck(list[i], list[i + 1], list[i + 2]); // Check a single boolean expression (field, oper, val)
 
                         if(oper != "" && (oper.ToLower() != "and" && oper.ToLower() != "or"))
                         {
@@ -147,9 +153,9 @@ namespace QueryTask
                         }
 
                         if (boolInt == 0) // false
-                            flag = this.updateBoolFlag(flag, i, oper, false, countLists);
+                            flag = UpdateBoolFlag(flag, i, oper, false, countLists);
                         else if (boolInt == 1) // true
-                            flag = this.updateBoolFlag(flag, i, oper, true, countLists);
+                            flag = UpdateBoolFlag(flag, i, oper, true, countLists);
                         else if (boolInt == 2) // Wrong input in the "where" section
                         {
                             if(type == 0)
@@ -158,22 +164,20 @@ namespace QueryTask
                                 Console.WriteLine("Wrong 'where' input - User not include the field '" + list[i] + "'");
                             return defualtL;
                         }
-
-                        if (list.Count > i + 4) // Check if the current list is including more expressions (parenthesis expression)
+                        if (list.Count > i + 4) // Check if the current list is including more expressions (parentheses expression)
                             oper = list[i + 3];
                         continue;
                     }
                 }
                 if (flag) // Check if curr is Qualify the Query criteria
                     candidates.Add(curr);
-                flag = true;
             }
             return candidates;
         }
 
 
 
-        public bool updateBoolFlag(bool flag, int i, String oper, bool isTrue, int countLists) // Function for updating the boolean value that determine the qualify of an Object on the Query criteria
+        public bool UpdateBoolFlag(bool flag, int i, string oper, bool isTrue, int countLists) // Function for updating the boolean value that determine the qualify of an Object on the Query criteria
         {
             if (i == 0 && countLists == 1)
                 flag = isTrue;
@@ -187,20 +191,20 @@ namespace QueryTask
             return flag;
         }
 
-        public List<List<String>> ParseWhere(String where) // Function for parsing the "where" section to List<List<String>>, each List contain boolean expression
+        public List<List<string>> ParseWhere(string where) // Function for parsing the "where" section to List<List<string>>, each List contain boolean expression
         {
-            List<List<String>> words = new List<List<String>>();
+            List<List<string>> words = new List<List<string>>();
             bool first = false;
             bool second = false;
             bool isPara = false;
             bool isStr = false;
             bool addedOper = false;
             int fixedIndex = 0;
-            String currWord = "";
+            string currWord = "";
 
             for (int i = 0; i < where.Length; i++)
             {
-                if (i + fixedIndex >= where.Length)
+                if (i + fixedIndex >= where.Length) // Check if we finished the parsing
                 {
                     if (!currWord.Equals(""))
                     {
@@ -210,9 +214,9 @@ namespace QueryTask
                     }
                     break;
                 }
-                if (!first && !addedOper && words.Count != 0)
+                if (!first && !addedOper && words.Count != 0) // Check if we parsing the second (or more) expression in a parentheses expression
                 {
-                    String oper = "";
+                    string oper = "";
                     int currIndex = 0;
 
                     while (true)
@@ -227,20 +231,20 @@ namespace QueryTask
                             currIndex += 1;
                         }
                     }
-                    List<String> l = new List<string>();
-                    l.Add(oper);
-                    words.Add(l);
+                    List<string> operList = new List<string>();
+                    operList.Add(oper);
+                    words.Add(operList);
                     addedOper = true;
                     fixedIndex += currIndex;
                     continue;
                 }
-                if (!isPara)
+                if (!isPara) // Check if we are not parsing a parentheses expression 
                 {
                     if (where[i + fixedIndex] != ' ' && where[i + fixedIndex] != '(' && where[i + fixedIndex] != '\'' && where[i + fixedIndex] != '"')
                     {
                         currWord += where[i + fixedIndex];
                     }
-                    else if (where[i + fixedIndex] == '\'' || where[i + fixedIndex] == '"')
+                    else if (where[i + fixedIndex] == '\'' || where[i + fixedIndex] == '"') // Check if we starting/finishing parsing a string value (name, city, etc..) 
                     {
                         if (isStr)
                         {
@@ -254,50 +258,47 @@ namespace QueryTask
                     }
                     else if (where[i + fixedIndex] == ' ')
                     {
-                        if (isStr)
+                        if (isStr) // Check if the ' ' is inside a string value (name, city, etc..)
                         {
                             currWord += '-';
                         }
-                        else if (first && second)
+                        else if (first && second) // Check if we finished to parse the first + second operand
                         {
                             words.Add(currWord.Split(' ').ToList());
                             currWord = "";
                             first = false;
                             second = false;
                             addedOper = false;
-
                         }
-                        else if (first)
+                        else if (first) // Check if we finished to parse the first operand
                         {
                             currWord += where[i + fixedIndex];
                             second = true;
                         }
                         else
                         {
-                            if (currWord.Equals(""))
+                            if (currWord.Equals("")) // Check if the ' ' is between expressions
                             {
                                 continue;
                             }
-                            currWord += where[i + fixedIndex];
+                            currWord += where[i + fixedIndex]; // The ' ' is after the first operand
                             first = true;
                         }
                     }
-                    else if (where[i + fixedIndex] == '(')
-
+                    else if (where[i + fixedIndex] == '(') // Check if the we starting parsing a parentheses expression
                     {
                         isPara = true;
                         first = false;
                         second = false;
                     }
-
                     else
                     {
                         continue;
                     }
                 }
-                else
+                else // we are parsing a parentheses expression 
                 {
-                    if (where[i + fixedIndex] == '\'' || where[i + fixedIndex] == '"')
+                    if (where[i + fixedIndex] == '\'' || where[i + fixedIndex] == '"') // Check if we starting/finishing parsing a string value (name, city, etc..) 
                     {
                         if (isStr)
                         {
@@ -313,7 +314,7 @@ namespace QueryTask
                     {
                         if (where[i + fixedIndex] == ' ')
                         {
-                            if (isStr)
+                            if (isStr) // Check if the ' ' is inside a string value (name, city, etc..)
                             {
                                 currWord += '-';
                                 continue;
@@ -321,8 +322,7 @@ namespace QueryTask
                         }
                         currWord += where[i + fixedIndex];
                     }
-
-                    else if (where[i + fixedIndex] == ')')
+                    else if (where[i + fixedIndex] == ')') // we are finishing parsing a parentheses expression 
                     {
                         words.Add(currWord.Split(' ').ToList());
                         currWord = "";
@@ -332,19 +332,18 @@ namespace QueryTask
                     }
                 }
             }
-            if (!currWord.Equals(""))
+            if (!currWord.Equals("")) // Adding the boolean expression to the result list
             {
                 words.Add(currWord.Split(' ').ToList());
                 currWord = "";
             }
-
-            return this.fixStr(words);
+            return FixStr(words);
         }
 
 
-        public List<List<String>> fixStr(List<List<String>> words) // Function for fixing the String inputs that came with ' '/" " in the Query
+        public List<List<string>> FixStr(List<List<string>> words) // Function for fixing the string inputs that came with ' '/" " in the Query
         {
-            foreach (List<String> list in words)
+            foreach (List<string> list in words)
             {
                 for (int i = 0; i < list.Count; i++)
                 {

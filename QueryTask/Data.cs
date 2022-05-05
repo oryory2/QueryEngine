@@ -13,30 +13,30 @@ namespace QueryTask
 
         public Data()
         {
-            this.Users = new List<User>();
-            this.Orders = new List<Order>();
+            Users = new List<User>();
+            Orders = new List<Order>();
         }
 
-        public void addUser(User u)
+        public void AddUser(User u)
         {
-            this.Users.Add(u);
-            Console.WriteLine("User: '" + u.getName() + "' has been added to the DataBase");
+            Users.Add(u);
+            Console.WriteLine("User: '" + u.GetName() + "' has been added to the DataBase");
         }
 
-        public void addOrder(Order o)
+        public void AddOrder(Order o)
         {
-            this.Orders.Add(o);
-            Console.WriteLine("Order: '" + o.getName() + "' has been added to the DataBase");
+            Orders.Add(o);
+            Console.WriteLine("Order: '" + o.GetName() + "' has been added to the DataBase");
         }
 
-        public List<Object> getUsers()
+        public List<Object> GetUsers()
         {
-            return this.Users.Cast<object>().ToList(); ;
+            return Users.Cast<object>().ToList(); ;
         }
 
-        public List<Object> getOrders()
+        public List<Object> GetOrders()
         {
-            return this.Orders.Cast<object>().ToList(); ;
+            return Orders.Cast<object>().ToList(); ;
         }
     }
 }

@@ -8,65 +8,66 @@ namespace QueryTask
 {
     class Order
     {
-        public string name;
+        public string fullName;
         public int id;
 
 
-        public Order(String fullName, int id)
+        public Order(string fullName, int id)
         {
-            this.name = fullName;
+            this.fullName = fullName;
             this.id = id;
         }
 
-        public String getName()
+        public string GetName()
         {
-            return this.name;
+            return fullName;
         }
 
-        public int getId()
+        public int GetId()
         {
-            return this.id;
+            return id;
         }
 
 
-        public int booleanExpressionCheck(String field, String oper, String val) // Function for cheking a boolean expression (0 - false, 1 - true, 2 - wrong input)
+        public int BooleanExpressionCheck(string field, string oper, string val) // Function for cheking a boolean expression (0 - false, 1 - true, 2 - wrong input)
         {
             switch (field)
             {
                 case ("FullName"):
-                    if (this.getName().Equals(val))
-                        return 1;
-                    else
-                        return 0;
-
+                    return CheckName(val);
                 case ("Id"):
-                    if (oper == "=")
-                    {
-                        if (this.getId() == Int32.Parse(val))
-                            return 1;
-                        else
-                            return 0;
-                    }
-                    break;
+                    return CheckId(val);
                 default:
-                    return 2; // wrong input field
+                    return 2;
             }
-            return 2;
+        }
+        private int CheckName(string val) // 0 - false, 1 - true
+        {
+            if (GetName().Equals(val))
+                return 1; 
+            else
+                return 0;
         }
 
-
-
-        public List<String> getFields(String field, List<String> currUserList) // Function for getting the needed fields by the "select" section
+        private int CheckId(string val) // 0 - false, 1 - true
         {
-            List<String> defualtL = new List<String>();
+            if (GetId() == Int32.Parse(val))
+                return 1;
+            else
+                return 0;
+        }
+
+        public List<string> GetFields(string field, List<string> currUserList) // Function for getting the needed fields by the "select" section
+        {
+            List<string> defualtL = new List<string>();
 
             switch (field)
             {
                 case ("FullName"):
-                    currUserList.Add(this.getName());
+                    currUserList.Add(GetName());
                     break;
                 case ("Id"):
-                    currUserList.Add(this.getId().ToString());
+                    currUserList.Add(GetId().ToString());
                     break;
                 default:
                     return defualtL;

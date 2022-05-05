@@ -15,17 +15,17 @@ namespace QueryTask
             Order o2 = new Order("B", 123);
 
 
-            d.addUser(u1);
-            d.addUser(u2);
-            d.addUser(u3);
+            d.AddUser(u1);
+            d.AddUser(u2);
+            d.AddUser(u3);
 
-            d.addOrder(o1);
-            d.addOrder(o2);
+            d.AddOrder(o1);
+            d.AddOrder(o2);
 
             QueryEngine q = new QueryEngine(d);
 
-            List<List<String>> queryAns1 = q.handleQuery("from Users where Age = 40      or (Age <= 30 AND Email = 'oryory2@gmail.com' AND Age >= 29) AND FullName = 'John Doe' select Email, Age, FullName");
-            List<List<String>> queryAns2 = q.handleQuery("from Orders\nwhere (FullName\n    = 'A' oR FullName =\n        'C')       and (Id = 123 Or Id = 124) select FullName, Id");
+            List<List<String>> queryAns1 = q.HandleQuery("from Users where Age = 40      or (Age <= 30 AND Email = 'oryory2@gmail.com' AND Age >= 29) AND FullName = 'John Doe' select Email, Age, FullName");
+            List<List<String>> queryAns2 = q.HandleQuery("from Orders\nwhere (FullName\n    = 'A' oR FullName =\n        'C')       and (Id = 123 Or Id = 124) select FullName, Id");
 
         }
     }
