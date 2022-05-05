@@ -7,6 +7,7 @@ namespace QueryTask
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("push");
             Data d = new Data();
             User u1 = new User("x", "oryory2@gmailg.com", 31);
             User u2 = new User("John Doe", "oryory2@gmail.com", 30);
