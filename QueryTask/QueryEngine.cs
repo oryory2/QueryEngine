@@ -101,7 +101,7 @@ namespace QueryTask
                         continue;
                     }
                 }
-                if (flag) // Check if curr is Qualify the Query criteria
+                if (flag) // Check if the Object is Qualify the Query criteria
                     candidates.Add(curr);
             }
             return candidates;
@@ -124,7 +124,7 @@ namespace QueryTask
         public List<List<string>> GetWantedFields(List<Object> candidates, string select, int type) // Function for creating the Query Answer (type: 0 = Order, 1 = User)
         {
             List<List<string>> defualtL = new();
-            List<List<string>> l = new();
+            List<List<string>> result = new();
 
             if (candidates.Count == 0) // Check if there is no Candidate Objects
                 return defualtL;
@@ -155,9 +155,9 @@ namespace QueryTask
                             return defualtL;
                         }
                     }
-                    l.Add(currObjList);
+                    result.Add(currObjList);
                 }
-                return l;
+                return result;
             }
         }
     }
