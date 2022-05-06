@@ -107,9 +107,9 @@ namespace QueryTask
                 return 2;
         }
 
-        public List<string> GetFields(string field, List<string> currUserList) // Function for getting the needed fields by the "select" section
+        public List<string> GetField(string field, List<string> currUserList) // Function for getting the needed fields by the "select" section
         {
-            List<string> defualtL = new List<string>();
+            List<string> defualtL = new();
 
             switch (field)
             {

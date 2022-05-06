@@ -8,11 +8,12 @@ namespace QueryTask
         static void Main(string[] args)
         {
             Data d = new Data();
-            User u1 = new User("x", "oryory2@gmailg.com", 31);
-            User u2 = new User("John Doe", "oryory2@gmail.com", 30);
-            User u3 = new User("John Doe", "oryory2@gmail.com", 29);
-            Order o1 = new Order("A", 123);
-            Order o2 = new Order("B", 123);
+
+            User u1 = new("x", "oryory2@gmailg.com", 31);
+            User u2 = new("John Doe", "oryory2@gmail.com", 30);
+            User u3 = new("John Doe", "oryory2@gmail.com", 29);
+            Order o1 = new("A", 123);
+            Order o2 = new("B", 123);
 
 
             d.AddUser(u1);
