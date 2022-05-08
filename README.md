@@ -10,4 +10,3 @@ Assumptions:
   - The only Object in the DataBase are Users And Orders.
       - User fields: FullName, Email, Age.
       - Order fields: FullName, Id.
-  - This QueryEngine is Case Sensitive.
